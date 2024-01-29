@@ -5,7 +5,7 @@ import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
-import { fetchData } from './ApiImage/api';
+import fetchData from './ApiImage/api';
 
 const App = () => {
   const [query, setQuery] = useState('');

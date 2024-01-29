@@ -1,4 +1,4 @@
-export const fetchData = async (query, pageNumber) => {
+const fetchData = async (query, pageNumber) => {
   const apiKey = '42101269-8c4d520152e5b925cc1944b87';
   const perPage = 12;
   const url = `https://pixabay.com/api/?q=${query}&page=${pageNumber}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=${perPage}`;
@@ -11,3 +11,5 @@ export const fetchData = async (query, pageNumber) => {
     throw new Error(`Error fetching data: ${error}`);
   }
 };
+
+export default fetchData;
