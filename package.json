@@ -2,7 +2,7 @@
   "name": "react-hw-03-image-finder",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://TorYev.github.io/react-hw-03-image-finder/",
+  "homepage": "https://toryev.github.io/goit-react-hw-03-image-finder/",
   "dependencies": {
     "@emotion/styled": "^11.11.0",
     "@testing-library/jest-dom": "^5.16.3",
