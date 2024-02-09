@@ -1,68 +1,81 @@
-import React, { useState, useEffect } from 'react';
+import React, { Component } from 'react';
 import { AppContainer } from './App.styled';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
-import fetchData from './ApiImage/api';
 
-const App = () => {
-  const [query, setQuery] = useState('');
-  const [images, setImages] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-
-  const handleSearch = async value => {
-    setQuery(value);
-    setImages([]);
-    setPage(1);
-    await loadImages(value, 1);
+class App extends Component {
+  state = {
+    query: '',
+    images: [],
+    selectedImage: null,
+    page: 1,
+    loading: false,
   };
 
-  const handleLoadMore = async () => {
-    await loadImages(query, page + 1);
+  handleSearch = value => {
+    this.setState({
+      query: value,
+      images: [],
+      page: 1,
+    });
+    this.fetchData(value, 1);
   };
 
-  const handleImageClick = largeImageURL => {
-    setSelectedImage(largeImageURL);
+  handleLoadMore = () => {
+    this.fetchData(this.state.query, this.state.page + 1);
   };
 
-  const handleCloseModal = () => {
-    setSelectedImage(null);
+  handleImageClick = largeImageURL => {
+    this.setState({ selectedImage: largeImageURL });
   };
 
-  const loadImages = async (query, pageNumber) => {
-    setLoading(true);
-    try {
-      const newImages = await fetchData(query, pageNumber);
-      setImages(prev => [...prev, ...newImages]);
-      setPage(pageNumber);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
+  handleCloseModal = () => {
+    this.setState({ selectedImage: null });
   };
 
-  useEffect(() => {
-    if (query) {
-      loadImages(query, page);
-    }
-  }, [query, page]);
+  fetchData = (query, pageNumber) => {
+    const apiKey = '40931429-8ff889ea2e193444bfa6c5882';
+    const perPage = 12;
+    const url = `https://pixabay.com/api/?q=${query}&page=${pageNumber}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=${perPage}`;
 
-  return (
-    <AppContainer>
-      <Searchbar onSubmit={handleSearch} />
-      <ImageGallery images={images} onImageClick={handleImageClick} />
-      {images.length > 0 && <Button onLoadMore={handleLoadMore} />}
-      {selectedImage && (
-        <Modal onCloseModal={handleCloseModal} imageUrl={selectedImage} />
-      )}
-      {loading && <Loader />}
-    </AppContainer>
-  );
-};
+    this.setState({ loading: true });
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        this.setState(prevState => ({
+          images: [...prevState.images, ...data.hits],
+          page: pageNumber,
+        }));
+      })
+      .catch(error => console.error('Error fetching data:', error))
+      .finally(() => this.setState({ loading: false }));
+  };
+
+  render() {
+    return (
+      <AppContainer>
+        <Searchbar onSubmit={this.handleSearch} />
+        <ImageGallery
+          images={this.state.images}
+          onImageClick={this.handleImageClick}
+        />
+        {this.state.images.length > 0 && (
+          <Button onLoadMore={this.handleLoadMore} />
+        )}
+        {this.state.selectedImage && (
+          <Modal
+            onCloseModal={this.handleCloseModal}
+            imageUrl={this.state.selectedImage}
+          />
+        )}
+        {this.state.loading && <Loader />}
+      </AppContainer>
+    );
+  }
+}
 
 export default App;
